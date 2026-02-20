@@ -52,3 +52,35 @@ path = "examples/agent_browse.rs"
 [[example]]
 name = "baidu"
 path = "examples/baidu.rs"
+
+[[example]]
+name = "auto_login"
+path = "examples/auto_login.rs"
+
+[[example]]
+name = "screenshot"
+path = "examples/screenshot.rs"
+
+[[example]]
+name = "copy_paste"
+path = "examples/copy_paste.rs"
+
+[[example]]
+name = "file_ops"
+path = "examples/file_ops.rs"
+
+[[example]]
+name = "window_mgmt"
+path = "examples/window_mgmt.rs"
+
+[[example]]
+name = "browser_shortcuts"
+path = "examples/browser_shortcuts.rs"
+
+[[example]]
+name = "draw_mouse"
+path = "examples/draw_mouse.rs"
+
+[[example]]
+name = "drag_drop"
+path = "examples/drag_drop.rs"
