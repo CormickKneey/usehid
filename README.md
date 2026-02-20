@@ -2,7 +2,9 @@
 
 > Cross-platform virtual HID device library for AI agents
 
-[![Rust](https://img.shields.io/badge/rust-1.70+-orange.svg)](https://www.rust-lang.org/)
+[![Crates.io](https://img.shields.io/crates/v/usehid-core.svg)](https://crates.io/crates/usehid-core)
+[![PyPI](https://img.shields.io/pypi/v/usehid.svg)](https://pypi.org/project/usehid/)
+[![npm](https://img.shields.io/npm/v/usehid.svg)](https://www.npmjs.com/package/usehid)
 [![License](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
 [![Platform](https://img.shields.io/badge/platform-macOS%20%7C%20Linux%20%7C%20Windows-lightgrey.svg)](#platform-support)
 
@@ -149,18 +151,13 @@ usehid-core = "0.1"
 ### Python
 
 ```bash
-# From source (requires Rust toolchain)
-cd usehid-python
-pip install maturin
-maturin develop --release
+pip install usehid
 ```
 
 ### TypeScript / Node.js
 
 ```bash
-cd usehid-node
-npm install
-npm run build
+npm install usehid
 ```
 
 ### Go
@@ -257,9 +254,7 @@ useHID can be integrated with [OpenClaw](https://github.com/openclaw/openclaw) t
 
 1. **Install useHID:**
 ```bash
-cd usehid/usehid-python
-pip install maturin
-maturin develop --release
+pip install usehid
 ```
 
 2. **Grant Permissions (macOS):**

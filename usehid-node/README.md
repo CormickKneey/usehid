@@ -1,5 +1,8 @@
 # useHID Node.js Bindings
 
+[![npm](https://img.shields.io/npm/v/usehid.svg)](https://www.npmjs.com/package/usehid)
+[![Node](https://img.shields.io/node/v/usehid.svg)](https://www.npmjs.com/package/usehid)
+
 Cross-platform virtual HID device library for Node.js/TypeScript.
 
 ## Installation

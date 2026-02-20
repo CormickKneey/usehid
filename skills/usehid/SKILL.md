@@ -9,14 +9,12 @@ This skill enables OpenClaw to control your computer's input devices programmati
 ## Requirements
 
 - Python 3.9+
-- usehid Python package (install from source until PyPI is available)
+- usehid Python package
 
 ### Installation
 
 ```bash
-cd /path/to/usehid/usehid-python
-pip install maturin
-maturin develop --release
+pip install usehid
 ```
 
 ### macOS Permissions

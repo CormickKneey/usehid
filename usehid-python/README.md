@@ -1,5 +1,8 @@
 # useHID Python Bindings
 
+[![PyPI](https://img.shields.io/pypi/v/usehid.svg)](https://pypi.org/project/usehid/)
+[![Python](https://img.shields.io/pypi/pyversions/usehid.svg)](https://pypi.org/project/usehid/)
+
 Cross-platform virtual HID device library for Python.
 
 ## Installation
