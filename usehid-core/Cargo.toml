@@ -1,0 +1,49 @@
+[package]
+name = "usehid-core"
+version.workspace = true
+edition.workspace = true
+authors.workspace = true
+license.workspace = true
+description = "Cross-platform virtual HID device core library"
+
+[features]
+default = []
+
+[dependencies]
+thiserror.workspace = true
+tracing.workspace = true
+serde.workspace = true
+serde_json.workspace = true
+bitflags = { version = "2.8", features = ["serde"] }
+
+[target.'cfg(target_os = "macos")'.dependencies]
+core-foundation = "0.10"
+io-kit-sys = "0.4"
+
+[target.'cfg(target_os = "linux")'.dependencies]
+nix = { version = "0.29", features = ["ioctl", "fs"] }
+
+[target.'cfg(target_os = "windows")'.dependencies]
+windows = { version = "0.58", features = [
+    "Win32_Foundation",
+    "Win32_Devices_HumanInterfaceDevice",
+] }
+
+[dev-dependencies]
+tokio = { version = "1", features = ["full"] }
+
+[[example]]
+name = "mouse"
+path = "examples/mouse.rs"
+
+[[example]]
+name = "keyboard"
+path = "examples/keyboard.rs"
+
+[[example]]
+name = "agent"
+path = "examples/agent.rs"
+
+[[example]]
+name = "agent_browse"
+path = "examples/agent_browse.rs"

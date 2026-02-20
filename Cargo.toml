@@ -1,0 +1,21 @@
+[workspace]
+resolver = "2"
+members = [
+    "usehid-core",
+    "usehid-python",
+    # "usehid-node",  # TODO: napi-rs binding
+]
+
+[workspace.package]
+version = "0.1.0"
+edition = "2021"
+authors = ["Zoe <zoe@zoe.im>"]
+license = "MIT"
+repository = "https://github.com/jiusanzhou/usehid"
+description = "Cross-platform virtual HID device library for AI agents"
+
+[workspace.dependencies]
+thiserror = "2.0"
+tracing = "0.1"
+serde = { version = "1.0", features = ["derive"] }
+serde_json = "1.0"

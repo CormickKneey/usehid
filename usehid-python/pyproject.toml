@@ -1,0 +1,37 @@
+[build-system]
+requires = ["maturin>=1.0,<2.0"]
+build-backend = "maturin"
+
+[project]
+name = "usehid"
+version = "0.1.0"
+description = "Cross-platform virtual HID device library for AI agents"
+readme = "README.md"
+requires-python = ">=3.8"
+license = { text = "MIT" }
+authors = [
+    { name = "Zoe", email = "zoe@zoe.im" }
+]
+classifiers = [
+    "Development Status :: 3 - Alpha",
+    "Intended Audience :: Developers",
+    "License :: OSI Approved :: MIT License",
+    "Operating System :: MacOS",
+    "Operating System :: POSIX :: Linux",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.8",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Rust",
+    "Topic :: Software Development :: Libraries",
+]
+keywords = ["hid", "virtual", "mouse", "keyboard", "automation", "ai", "agent"]
+
+[project.urls]
+Homepage = "https://github.com/jiusanzhou/usehid"
+Repository = "https://github.com/jiusanzhou/usehid"
+
+[tool.maturin]
+features = ["pyo3/extension-module"]
