@@ -2,7 +2,7 @@
 
 > Cross-platform virtual HID device library for AI agents
 
-[![Crates.io](https://img.shields.io/crates/v/usehid-core.svg)](https://crates.io/crates/usehid-core)
+[![Crates.io](https://img.shields.io/crates/v/usehid.svg)](https://crates.io/crates/usehid)
 [![PyPI](https://img.shields.io/pypi/v/usehid.svg)](https://pypi.org/project/usehid/)
 [![npm](https://img.shields.io/npm/v/usehid.svg)](https://www.npmjs.com/package/usehid)
 [![License](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
@@ -145,7 +145,7 @@ No special permissions required. Uses Win32 `SendInput` API for mouse and keyboa
 
 ```toml
 [dependencies]
-usehid-core = "0.1"
+usehid = "0.1"
 ```
 
 ### Python
@@ -163,11 +163,11 @@ npm install usehid
 ### Go
 
 ```bash
-go get go.zoe.im/usehid-go@latest
+go get go.zoe.im/usehid@latest
 ```
 
 ```go
-import usehid "go.zoe.im/usehid-go"
+import usehid "go.zoe.im/usehid"
 ```
 
 ---
@@ -177,7 +177,7 @@ import usehid "go.zoe.im/usehid-go"
 ### Open Chrome and Browse (Agent Test)
 
 ```bash
-cargo run --release -p usehid-core --example agent_browse
+cargo run --release -p usehid --example agent_browse
 ```
 
 This example demonstrates an AI agent:
@@ -191,13 +191,13 @@ This example demonstrates an AI agent:
 ### Basic Mouse Control
 
 ```bash
-cargo run --release -p usehid-core --example mouse
+cargo run --release -p usehid --example mouse
 ```
 
 ### Keyboard Typing
 
 ```bash
-cargo run --release -p usehid-core --example keyboard
+cargo run --release -p usehid --example keyboard
 ```
 
 ---
@@ -206,7 +206,7 @@ cargo run --release -p usehid-core --example keyboard
 
 ```
 usehid/
-├── usehid-core/          # Rust core library
+├── usehid/          # Rust core library
 │   ├── src/
 │   │   ├── lib.rs        # Public API
 │   │   ├── mouse.rs      # Virtual mouse

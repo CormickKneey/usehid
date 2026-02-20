@@ -2,7 +2,8 @@
 
 use pyo3::prelude::*;
 use pyo3::exceptions::PyRuntimeError;
-use usehid_core::{
+use usehid as usehid_crate;
+use usehid_crate::{
     AgentHID as CoreAgentHID,
     Device,
     Keyboard as CoreKeyboard,
@@ -274,7 +275,7 @@ impl AgentHID {
 
 /// Python module
 #[pymodule]
-fn usehid(m: &Bound<'_, PyModule>) -> PyResult<()> {
+fn usehid_py(m: &Bound<'_, PyModule>) -> PyResult<()> {
     m.add_class::<Mouse>()?;
     m.add_class::<Keyboard>()?;
     m.add_class::<Gamepad>()?;

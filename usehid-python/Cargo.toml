@@ -11,6 +11,6 @@ name = "usehid"
 crate-type = ["cdylib"]
 
 [dependencies]
-usehid-core = { path = "../usehid-core" }
+usehid = { path = "../usehid-core" }
 pyo3 = { version = "0.23", features = ["extension-module"] }
 serde_json = "1.0"

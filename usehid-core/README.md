@@ -1,8 +1,8 @@
-# usehid-core
+# usehid
 
-[![Crates.io](https://img.shields.io/crates/v/usehid-core.svg)](https://crates.io/crates/usehid-core)
-[![Documentation](https://docs.rs/usehid-core/badge.svg)](https://docs.rs/usehid-core)
-[![License](https://img.shields.io/crates/l/usehid-core.svg)](LICENSE)
+[![Crates.io](https://img.shields.io/crates/v/usehid.svg)](https://crates.io/crates/usehid)
+[![Documentation](https://docs.rs/usehid/badge.svg)](https://docs.rs/usehid)
+[![License](https://img.shields.io/crates/l/usehid.svg)](LICENSE)
 
 Cross-platform virtual HID device library for AI agents. Control mouse, keyboard, and gamepad programmatically.
 
@@ -30,7 +30,7 @@ Add to your `Cargo.toml`:
 
 ```toml
 [dependencies]
-usehid-core = "0.1"
+usehid = "0.1"
 ```
 
 ### For AI Agents (Recommended)
@@ -222,5 +222,5 @@ MIT License - see [LICENSE](https://github.com/jiusanzhou/usehid/blob/main/LICEN
 ## Links
 
 - [GitHub Repository](https://github.com/jiusanzhou/usehid)
-- [Documentation](https://docs.rs/usehid-core)
+- [Documentation](https://docs.rs/usehid)
 - [Changelog](https://github.com/jiusanzhou/usehid/releases)

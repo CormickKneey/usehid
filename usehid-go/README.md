@@ -1,13 +1,13 @@
 # useHID Go Bindings
 
-[![Go Reference](https://pkg.go.dev/badge/go.zoe.im/usehid-go.svg)](https://pkg.go.dev/go.zoe.im/usehid-go)
+[![Go Reference](https://pkg.go.dev/badge/go.zoe.im/usehid.svg)](https://pkg.go.dev/go.zoe.im/usehid)
 
 Cross-platform virtual HID device library for Go. Control mouse, keyboard, and gamepad programmatically.
 
 ## Installation
 
 ```bash
-go get go.zoe.im/usehid-go@latest
+go get go.zoe.im/usehid@latest
 ```
 
 ## Quick Start
@@ -16,7 +16,7 @@ go get go.zoe.im/usehid-go@latest
 package main
 
 import (
-    usehid "go.zoe.im/usehid-go"
+    usehid "go.zoe.im/usehid"
 )
 
 func main() {
@@ -103,7 +103,7 @@ func main() {
 package main
 
 import (
-    usehid "go.zoe.im/usehid-go"
+    usehid "go.zoe.im/usehid"
 )
 
 func main() {
@@ -178,5 +178,5 @@ MIT - see [LICENSE](../LICENSE)
 ## Links
 
 - [GitHub Repository](https://github.com/jiusanzhou/usehid)
-- [Rust Crate (usehid-core)](https://crates.io/crates/usehid-core)
-- [Documentation](https://pkg.go.dev/go.zoe.im/usehid-go)
+- [Rust Crate (usehid)](https://crates.io/crates/usehid)
+- [Documentation](https://pkg.go.dev/go.zoe.im/usehid)
