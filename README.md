@@ -118,9 +118,11 @@ keyboard.combo(["cmd"], "s")  # Cmd+S to save
 |----------|:-----:|:--------:|:-------:|---------|
 | **macOS** | ✅ | ✅ | ⚠️ | CGEvent (fallback) / IOHIDUserDevice |
 | **Linux** | ✅ | ✅ | ✅ | uhid (`/dev/uhid`) |
-| **Windows** | 🚧 | 🚧 | 🚧 | Planned: SendInput / ViGEmBus |
+| **Windows** | ✅ | ✅ | ⚠️ | SendInput API |
 
-> ⚠️ macOS Gamepad requires code signing with `com.apple.developer.hid.virtual.device` entitlement
+> ⚠️ Gamepad notes:
+> - macOS: Requires code signing with `com.apple.developer.hid.virtual.device` entitlement
+> - Windows: Requires [ViGEmBus](https://github.com/ViGEm/ViGEmBus) driver
 
 ### macOS Permissions
 
@@ -128,6 +130,10 @@ useHID uses **CGEvent** by default, which requires **Accessibility** permissions
 
 1. Go to **System Preferences → Security & Privacy → Privacy → Accessibility**
 2. Add your terminal app or the application using useHID
+
+### Windows
+
+No special permissions required. Uses Win32 `SendInput` API for mouse and keyboard.
 
 ---
 

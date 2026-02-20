@@ -18,9 +18,11 @@ Cross-platform virtual HID device library for AI agents. Control mouse, keyboard
 
 | Platform | Mouse | Keyboard | Gamepad | Backend |
 |----------|:-----:|:--------:|:-------:|---------|
-| macOS | ✅ | ✅ | ⚠️ | CGEvent |
-| Linux | ✅ | ✅ | ✅ | uhid |
-| Windows | ✅ | ✅ | ⚠️ | SendInput |
+| **macOS** | ✅ | ✅ | ⚠️ | CGEvent (fallback) / IOHIDUserDevice |
+| **Linux** | ✅ | ✅ | ✅ | uhid (`/dev/uhid`) |
+| **Windows** | ✅ | ✅ | ⚠️ | SendInput API |
+
+> ⚠️ macOS/Windows Gamepad requires special drivers (IOHIDUserDevice entitlements / ViGEmBus)
 
 ## Quick Start
 
