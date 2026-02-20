@@ -47,3 +47,7 @@ path = "examples/agent.rs"
 [[example]]
 name = "agent_browse"
 path = "examples/agent_browse.rs"
+
+[[example]]
+name = "baidu"
+path = "examples/baidu.rs"
