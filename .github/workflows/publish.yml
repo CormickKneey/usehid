@@ -4,6 +4,7 @@ on:
   push:
     tags:
       - 'v*'
+      - 'test-*'
   workflow_dispatch:
 
 jobs:
@@ -11,9 +12,10 @@ jobs:
     name: Build Python wheels
     runs-on: ${{ matrix.os }}
     strategy:
+      fail-fast: false
       matrix:
-        os: [ubuntu-latest, macos-latest, windows-latest]
-        python-version: ['3.9', '3.10', '3.11', '3.12']
+        os: [ubuntu-latest, macos-latest]
+        python-version: ['3.11']
     
     steps:
       - uses: actions/checkout@v4
@@ -39,43 +41,11 @@ jobs:
           name: wheel-${{ matrix.os }}-py${{ matrix.python-version }}
           path: usehid-python/target/wheels/*.whl
 
-  build-npm:
-    name: Build npm package
-    runs-on: ${{ matrix.os }}
-    strategy:
-      matrix:
-        os: [ubuntu-latest, macos-latest]
-    
-    steps:
-      - uses: actions/checkout@v4
-      
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: '20'
-      
-      - name: Install Rust
-        uses: dtolnay/rust-toolchain@stable
-      
-      - name: Install dependencies
-        working-directory: usehid-node
-        run: npm install
-      
-      - name: Build
-        working-directory: usehid-node
-        run: npm run build || echo "Build script not ready yet"
-      
-      - name: Upload artifact
-        uses: actions/upload-artifact@v4
-        with:
-          name: npm-${{ matrix.os }}
-          path: usehid-node/
-
   publish-pypi:
     name: Publish to PyPI
     needs: build-python
     runs-on: ubuntu-latest
-    if: startsWith(github.ref, 'refs/tags/')
+    if: startsWith(github.ref, 'refs/tags/v')
     permissions:
       id-token: write
       contents: read
@@ -89,18 +59,37 @@ jobs:
           path: dist/
       
       - name: List dist contents
-        run: ls -la dist/ || echo "dist directory not found"
+        run: ls -la dist/
       
       - name: Publish to PyPI
         uses: pypa/gh-action-pypi-publish@release/v1
         with:
           password: ${{ secrets.PYPI_API_TOKEN }}
 
+  test-publish-pypi:
+    name: Test Publish (dry run)
+    needs: build-python
+    runs-on: ubuntu-latest
+    if: startsWith(github.ref, 'refs/tags/test-')
+    
+    steps:
+      - name: Download all wheels
+        uses: actions/download-artifact@v4
+        with:
+          pattern: wheel-*
+          merge-multiple: true
+          path: dist/
+      
+      - name: List dist contents
+        run: |
+          echo "=== Wheels built ==="
+          ls -la dist/
+          echo "=== Ready for PyPI upload ==="
+
   publish-npm:
     name: Publish to npm
-    needs: build-npm
     runs-on: ubuntu-latest
-    if: startsWith(github.ref, 'refs/tags/')
+    if: startsWith(github.ref, 'refs/tags/v')
     
     steps:
       - uses: actions/checkout@v4
