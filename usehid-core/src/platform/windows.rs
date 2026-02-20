@@ -129,7 +129,7 @@ unsafe impl Send for WindowsKeyboardBackend {}
 unsafe impl Sync for WindowsKeyboardBackend {}
 
 #[cfg(target_os = "windows")]
-im WindowsKeyboardBackend {
+impl WindowsKeyboardBackend {
     pub fn new() -> Result<Self> {
         Ok(Self)
     }
