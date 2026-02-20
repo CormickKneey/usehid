@@ -249,6 +249,54 @@ maturin develop --release
 
 ---
 
+## 🤖 OpenClaw Integration
+
+useHID can be integrated with [OpenClaw](https://github.com/openclaw/openclaw) to give AI agents full control over your computer.
+
+### Quick Setup
+
+1. **Install useHID:**
+```bash
+cd usehid/usehid-python
+pip install maturin
+maturin develop --release
+```
+
+2. **Grant Permissions (macOS):**
+System Preferences → Security & Privacy → Privacy → Accessibility
+
+3. **Copy the skill to OpenClaw:**
+```bash
+cp -r skills/usehid ~/.openclaw/skills/
+```
+
+4. **Use it:**
+```
+You: Click the Chrome icon on the dock
+OpenClaw: [executes mouse_click at dock position]
+
+You: Type "github.com" and press enter  
+OpenClaw: [types text and presses enter]
+
+You: Scroll down slowly
+OpenClaw: [executes mouse_scroll multiple times]
+```
+
+### Example Commands
+
+| User Request | useHID Action |
+|--------------|---------------|
+| "Click here" | `{"action": "mouse_click"}` |
+| "Type hello world" | `{"action": "type", "text": "hello world"}` |
+| "Press Enter" | `{"action": "key_press", "key": "enter"}` |
+| "Save the file" | `{"action": "key_combo", "modifiers": ["cmd"], "key": "s"}` |
+| "Scroll down" | `{"action": "mouse_scroll", "delta": -3}` |
+| "Select all and copy" | Two actions: Cmd+A then Cmd+C |
+
+See [skills/usehid/SKILL.md](skills/usehid/SKILL.md) for full documentation.
+
+---
+
 ## 🤝 Use Cases
 
 - **AI Agents** — Let LLMs control desktop applications
