@@ -33,13 +33,13 @@ jobs:
       
       - name: Build wheel
         working-directory: usehid-python
-        run: maturin build --release
+        run: maturin build --release --out ../target/wheels
       
       - name: Upload wheel
         uses: actions/upload-artifact@v4
         with:
           name: wheel-${{ matrix.os }}-py${{ matrix.python-version }}
-          path: usehid-python/target/wheels/*.whl
+          path: target/wheels/*.whl
 
   publish-pypi:
     name: Publish to PyPI
