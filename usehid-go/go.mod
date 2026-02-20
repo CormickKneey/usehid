@@ -1,3 +1,3 @@
-module github.com/jiusanzhou/usehid-go
+module go.zoe.im/usehid-go
 
 go 1.21
