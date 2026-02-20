@@ -165,8 +165,12 @@ npm run build
 
 ### Go
 
+```bash
+go get go.zoe.im/usehid-go@latest
+```
+
 ```go
-import "github.com/jiusanzhou/usehid-go"
+import usehid "go.zoe.im/usehid-go"
 ```
 
 ---
