@@ -27,7 +27,7 @@ use std::mem::size_of;
 /// Windows SendInput mouse backend
 #[cfg(target_os = "windows")]
 pub struct WindowsMouseBackend {
-    buttons: u8,
+    buttons: std::cell::Cell<u8>,
 }
 
 #[cfg(target_os = "windows")]
@@ -38,7 +38,7 @@ unsafe impl Sync for WindowsMouseBackend {}
 #[cfg(target_os = "windows")]
 impl WindowsMouseBackend {
     pub fn new() -> Result<Self> {
-        Ok(Self { buttons: 0 })
+        Ok(Self { buttons: std::cell::Cell::new(0) })
     }
     
     fn send_mouse_input(&self, flags: MOUSE_EVENT_FLAGS, dx: i32, dy: i32, data: i32) -> Result<()> {
@@ -83,10 +83,9 @@ impl HidBackend for WindowsMouseBackend {
             self.send_mouse_input(MOUSEEVENTF_MOVE, dx, dy, 0)?;
         }
         
-        // Get mutable reference to update button state
-        let self_mut = unsafe { &mut *(self as *const Self as *mut Self) };
-        let old_buttons = self_mut.buttons;
-        self_mut.buttons = buttons;
+        // Update button state using Cell
+        let old_buttons = self.buttons.get();
+        self.buttons.set(buttons);
         
         // Left button
         if (buttons & 0x01) != 0 && (old_buttons & 0x01) == 0 {
