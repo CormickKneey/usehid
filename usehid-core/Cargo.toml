@@ -4,7 +4,13 @@ version.workspace = true
 edition.workspace = true
 authors.workspace = true
 license.workspace = true
-description = "Cross-platform virtual HID device core library"
+description = "Cross-platform virtual HID device library for AI agents"
+readme = "README.md"
+repository = "https://github.com/jiusanzhou/usehid"
+homepage = "https://github.com/jiusanzhou/usehid"
+documentation = "https://docs.rs/usehid-core"
+keywords = ["hid", "mouse", "keyboard", "automation", "agent"]
+categories = ["api-bindings", "hardware-support", "os"]
 
 [features]
 default = []
