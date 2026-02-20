@@ -4,29 +4,11 @@
   "description": "Cross-platform virtual HID device library for AI agents",
   "main": "index.js",
   "types": "index.d.ts",
-  "napi": {
-    "name": "usehid",
-    "triples": {
-      "defaults": true,
-      "additional": [
-        "aarch64-apple-darwin",
-        "x86_64-apple-darwin",
-        "x86_64-unknown-linux-gnu",
-        "aarch64-unknown-linux-gnu"
-      ]
-    }
-  },
   "files": [
     "index.js",
-    "index.d.ts"
+    "index.d.ts",
+    "README.md"
   ],
-  "scripts": {
-    "build": "napi build --platform --release",
-    "prepublishOnly": "napi prepublish -t npm"
-  },
-  "devDependencies": {
-    "@napi-rs/cli": "^2.18.0"
-  },
   "repository": {
     "type": "git",
     "url": "https://github.com/jiusanzhou/usehid"
@@ -40,8 +22,7 @@
     "gamepad",
     "automation",
     "ai",
-    "agent",
-    "napi-rs"
+    "agent"
   ],
   "author": "Zoe <zoe@zoe.im>"
 }
