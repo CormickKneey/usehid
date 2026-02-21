@@ -5,7 +5,7 @@
 //! Note: On macOS, this requires proper entitlements. Run with sudo or sign with
 //! com.apple.developer.hid.virtual.device entitlement.
 
-use usehid_core::{Device, Mouse, MouseButton};
+use usehid::{Device, Mouse, MouseButton};
 use std::thread::sleep;
 use std::time::Duration;
 

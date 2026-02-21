@@ -2,7 +2,7 @@
 //!
 //! Switch windows, minimize, maximize, close
 
-use usehid_core::AgentHID;
+use usehid::AgentHID;
 use std::thread::sleep;
 use std::time::Duration;
 

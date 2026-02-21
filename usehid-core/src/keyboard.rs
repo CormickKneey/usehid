@@ -264,18 +264,27 @@ impl Keyboard {
     /// Type a string
     pub fn type_text(&mut self, text: &str) -> Result<()> {
         for c in text.chars() {
-            if let Some(&(key, shift)) = self.char_map.get(&c) {
-                if shift {
-                    self.press_modifiers(Modifiers::SHIFT)?;
-                }
-                self.tap(key)?;
-                if shift {
-                    self.release_modifiers(Modifiers::SHIFT)?;
-                }
-                std::thread::sleep(std::time::Duration::from_millis(5));
-            }
+            self.type_char(c)?;
+            std::thread::sleep(std::time::Duration::from_millis(5));
         }
         Ok(())
+    }
+    
+    /// Type a single character
+    pub fn type_char(&mut self, c: char) -> Result<()> {
+        if let Some(&(key, shift)) = self.char_map.get(&c) {
+            if shift {
+                self.press_modifiers(Modifiers::SHIFT)?;
+            }
+            self.tap(key)?;
+            if shift {
+                self.release_modifiers(Modifiers::SHIFT)?;
+            }
+            Ok(())
+        } else {
+            // Skip unknown characters
+            Ok(())
+        }
     }
     
     /// Release all keys

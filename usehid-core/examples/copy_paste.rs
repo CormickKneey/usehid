@@ -2,7 +2,7 @@
 //!
 //! Demonstrates clipboard operations using keyboard shortcuts.
 
-use usehid_core::AgentHID;
+use usehid::AgentHID;
 use std::thread::sleep;
 use std::time::Duration;
 

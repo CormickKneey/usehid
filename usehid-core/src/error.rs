@@ -25,6 +25,15 @@ pub enum Error {
     #[error("Invalid action: {0}")]
     InvalidAction(String),
     
+    #[error("Query failed: {0}")]
+    QueryFailed(String),
+    
+    #[error("Move failed: {0}")]
+    MoveFailed(String),
+    
+    #[error("Failsafe triggered: {0}")]
+    FailsafeTriggered(String),
+    
     #[error("IO error: {0}")]
     Io(#[from] std::io::Error),
     

@@ -15,6 +15,29 @@ use usehid_crate::{
     GamepadButton,
 };
 
+/// Get the screen size (width, height)
+#[pyfunction]
+fn size() -> PyResult<(u32, u32)> {
+    let s = usehid_crate::size()
+        .map_err(|e| PyRuntimeError::new_err(e.to_string()))?;
+    Ok((s.width, s.height))
+}
+
+/// Get the current mouse position (x, y)
+#[pyfunction]
+fn position() -> PyResult<(i32, i32)> {
+    let p = usehid_crate::position()
+        .map_err(|e| PyRuntimeError::new_err(e.to_string()))?;
+    Ok((p.x, p.y))
+}
+
+/// Move mouse to absolute coordinates
+#[pyfunction]
+fn move_to(x: i32, y: i32) -> PyResult<()> {
+    usehid_crate::move_to(x, y)
+        .map_err(|e| PyRuntimeError::new_err(e.to_string()))
+}
+
 /// Virtual Mouse
 #[pyclass]
 struct Mouse {
@@ -37,6 +60,20 @@ impl Mouse {
     /// Move mouse by relative offset
     fn move_by(&mut self, dx: i32, dy: i32) -> PyResult<()> {
         self.inner.move_by(dx, dy)
+            .map_err(|e| PyRuntimeError::new_err(e.to_string()))
+    }
+    
+    /// Drag mouse by relative offset (press, move, release)
+    #[pyo3(signature = (dx, dy, button="left"))]
+    fn drag(&mut self, dx: i32, dy: i32, button: &str) -> PyResult<()> {
+        let btn = parse_mouse_button(button);
+        self.inner.press(btn)
+            .map_err(|e| PyRuntimeError::new_err(e.to_string()))?;
+        std::thread::sleep(std::time::Duration::from_millis(10));
+        self.inner.move_by(dx, dy)
+            .map_err(|e| PyRuntimeError::new_err(e.to_string()))?;
+        std::thread::sleep(std::time::Duration::from_millis(10));
+        self.inner.release(btn)
             .map_err(|e| PyRuntimeError::new_err(e.to_string()))
     }
     
@@ -280,5 +317,8 @@ fn usehid_py(m: &Bound<'_, PyModule>) -> PyResult<()> {
     m.add_class::<Keyboard>()?;
     m.add_class::<Gamepad>()?;
     m.add_class::<AgentHID>()?;
+    m.add_function(wrap_pyfunction!(size, m)?)?;
+    m.add_function(wrap_pyfunction!(position, m)?)?;
+    m.add_function(wrap_pyfunction!(move_to, m)?)?;
     Ok(())
 }

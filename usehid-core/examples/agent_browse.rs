@@ -5,7 +5,7 @@
 //! 2. Navigate to a website
 //! 3. Scroll and interact
 
-use usehid_core::AgentHID;
+use usehid::AgentHID;
 use std::thread::sleep;
 use std::time::Duration;
 

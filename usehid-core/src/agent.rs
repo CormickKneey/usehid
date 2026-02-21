@@ -3,6 +3,7 @@
 //! JSON-based interface for LLM agents to control HID devices.
 
 use crate::error::{Error, Result};
+use crate::tween::Tween;
 use crate::{Device, Keyboard, Key, Modifiers, Mouse, MouseButton, Gamepad, GamepadButton};
 use serde::{Deserialize, Serialize};
 
@@ -10,16 +11,63 @@ use serde::{Deserialize, Serialize};
 #[derive(Debug, Clone, Serialize, Deserialize)]
 #[serde(tag = "action", rename_all = "snake_case")]
 pub enum AgentAction {
+    // Screen/Query actions
+    Size,
+    Position,
+    
+    // Failsafe actions
+    FailsafeEnable,
+    FailsafeDisable,
+    FailsafeStatus,
+    FailsafeReset,
+    
     // Mouse actions
-    MouseMove { x: i32, y: i32 },
+    MouseMove { 
+        x: i32, 
+        y: i32,
+        #[serde(default)]
+        duration: Option<u64>,  // milliseconds
+        #[serde(default)]
+        tween: Option<String>,
+    },
+    MouseMoveTo { 
+        x: i32, 
+        y: i32,
+        #[serde(default)]
+        duration: Option<u64>,
+        #[serde(default)]
+        tween: Option<String>,
+    },
     MouseClick { button: Option<String> },
     MouseDoubleClick { button: Option<String> },
     MouseDown { button: Option<String> },
     MouseUp { button: Option<String> },
     MouseScroll { delta: i8 },
+    MouseDrag { 
+        x: i32, 
+        y: i32, 
+        button: Option<String>,
+        #[serde(default)]
+        duration: Option<u64>,
+        #[serde(default)]
+        tween: Option<String>,
+    },
+    MouseDragTo { 
+        x: i32, 
+        y: i32, 
+        button: Option<String>,
+        #[serde(default)]
+        duration: Option<u64>,
+        #[serde(default)]
+        tween: Option<String>,
+    },
     
     // Keyboard actions
-    Type { text: String },
+    Type { 
+        text: String,
+        #[serde(default)]
+        interval: Option<u64>,  // milliseconds between keystrokes
+    },
     KeyPress { key: String },
     KeyDown { key: String },
     KeyUp { key: String },
@@ -37,16 +85,41 @@ pub enum AgentAction {
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct AgentResult {
     pub success: bool,
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub error: Option<String>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub x: Option<i32>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub y: Option<i32>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub width: Option<u32>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub height: Option<u32>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub enabled: Option<bool>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub triggered: Option<bool>,
 }
 
 impl AgentResult {
     fn ok() -> Self {
-        Self { success: true, error: None }
+        Self { success: true, error: None, x: None, y: None, width: None, height: None, enabled: None, triggered: None }
     }
     
     fn err(msg: impl Into<String>) -> Self {
-        Self { success: false, error: Some(msg.into()) }
+        Self { success: false, error: Some(msg.into()), x: None, y: None, width: None, height: None, enabled: None, triggered: None }
+    }
+    
+    fn with_position(x: i32, y: i32) -> Self {
+        Self { success: true, error: None, x: Some(x), y: Some(y), width: None, height: None, enabled: None, triggered: None }
+    }
+    
+    fn with_size(width: u32, height: u32) -> Self {
+        Self { success: true, error: None, x: None, y: None, width: Some(width), height: Some(height), enabled: None, triggered: None }
+    }
+    
+    fn with_failsafe_status(enabled: bool, triggered: bool) -> Self {
+        Self { success: true, error: None, x: None, y: None, width: None, height: None, enabled: Some(enabled), triggered: Some(triggered) }
     }
 }
 
@@ -83,17 +156,53 @@ impl AgentHID {
     
     /// Execute an action
     pub fn execute(&mut self, action: AgentAction) -> AgentResult {
+        // Check failsafe before executing (except for failsafe control actions)
+        if !matches!(action, AgentAction::FailsafeEnable | AgentAction::FailsafeDisable | 
+                            AgentAction::FailsafeStatus | AgentAction::FailsafeReset | 
+                            AgentAction::Size | AgentAction::Position) {
+            if let Err(e) = crate::failsafe::check_failsafe_default() {
+                return AgentResult::err(format!("Failsafe: {}", e));
+            }
+        }
+        
         match action {
+            // Screen/Query
+            AgentAction::Size => self.get_size(),
+            AgentAction::Position => self.get_position(),
+            
+            // Failsafe
+            AgentAction::FailsafeEnable => {
+                crate::failsafe::set_failsafe_enabled(true);
+                AgentResult::ok()
+            }
+            AgentAction::FailsafeDisable => {
+                crate::failsafe::set_failsafe_enabled(false);
+                AgentResult::ok()
+            }
+            AgentAction::FailsafeStatus => {
+                AgentResult::with_failsafe_status(
+                    crate::failsafe::is_failsafe_enabled(),
+                    crate::failsafe::is_failsafe_triggered(),
+                )
+            }
+            AgentAction::FailsafeReset => {
+                crate::failsafe::reset_failsafe();
+                AgentResult::ok()
+            }
+            
             // Mouse
-            AgentAction::MouseMove { x, y } => self.mouse_move(x, y),
+            AgentAction::MouseMove { x, y, duration, tween } => self.mouse_move_with_duration(x, y, duration, tween),
+            AgentAction::MouseMoveTo { x, y, duration, tween } => self.mouse_move_to_with_duration(x, y, duration, tween),
             AgentAction::MouseClick { button } => self.mouse_click(button),
             AgentAction::MouseDoubleClick { button } => self.mouse_double_click(button),
             AgentAction::MouseDown { button } => self.mouse_down(button),
             AgentAction::MouseUp { button } => self.mouse_up(button),
             AgentAction::MouseScroll { delta } => self.mouse_scroll(delta),
+            AgentAction::MouseDrag { x, y, button, duration, tween } => self.mouse_drag_with_duration(x, y, button, duration, tween),
+            AgentAction::MouseDragTo { x, y, button, duration, tween } => self.mouse_drag_to_with_duration(x, y, button, duration, tween),
             
             // Keyboard
-            AgentAction::Type { text } => self.type_text(&text),
+            AgentAction::Type { text, interval } => self.type_text_with_interval(&text, interval),
             AgentAction::KeyPress { key } => self.key_press(&key),
             AgentAction::KeyDown { key } => self.key_down(&key),
             AgentAction::KeyUp { key } => self.key_up(&key),
@@ -177,6 +286,20 @@ impl AgentHID {
     }
     
     // Mouse actions
+    fn get_size(&self) -> AgentResult {
+        match crate::screen::size() {
+            Ok(s) => AgentResult::with_size(s.width, s.height),
+            Err(e) => AgentResult::err(e.to_string()),
+        }
+    }
+    
+    fn get_position(&self) -> AgentResult {
+        match crate::screen::position() {
+            Ok(p) => AgentResult::with_position(p.x, p.y),
+            Err(e) => AgentResult::err(e.to_string()),
+        }
+    }
+    
     fn mouse_move(&mut self, x: i32, y: i32) -> AgentResult {
         if let Err(e) = self.ensure_mouse() {
             return AgentResult::err(e.to_string());
@@ -185,6 +308,72 @@ impl AgentHID {
             Ok(_) => AgentResult::ok(),
             Err(e) => AgentResult::err(e.to_string()),
         }
+    }
+    
+    fn mouse_move_with_duration(&mut self, x: i32, y: i32, duration: Option<u64>, tween: Option<String>) -> AgentResult {
+        let duration_ms = duration.unwrap_or(0);
+        if duration_ms == 0 {
+            return self.mouse_move(x, y);
+        }
+        
+        // Get current position for relative move calculation
+        let current = match crate::screen::position() {
+            Ok(p) => p,
+            Err(e) => return AgentResult::err(e.to_string()),
+        };
+        
+        let target_x = current.x + x;
+        let target_y = current.y + y;
+        
+        self.animate_move(current.x, current.y, target_x, target_y, duration_ms, tween)
+    }
+    
+    fn mouse_move_to(&mut self, x: i32, y: i32) -> AgentResult {
+        match crate::screen::move_to(x, y) {
+            Ok(_) => AgentResult::ok(),
+            Err(e) => AgentResult::err(e.to_string()),
+        }
+    }
+    
+    fn mouse_move_to_with_duration(&mut self, x: i32, y: i32, duration: Option<u64>, tween: Option<String>) -> AgentResult {
+        let duration_ms = duration.unwrap_or(0);
+        if duration_ms == 0 {
+            return self.mouse_move_to(x, y);
+        }
+        
+        let current = match crate::screen::position() {
+            Ok(p) => p,
+            Err(e) => return AgentResult::err(e.to_string()),
+        };
+        
+        self.animate_move(current.x, current.y, x, y, duration_ms, tween)
+    }
+    
+    fn animate_move(&mut self, start_x: i32, start_y: i32, end_x: i32, end_y: i32, duration_ms: u64, tween: Option<String>) -> AgentResult {
+        let tween_fn = tween
+            .as_ref()
+            .and_then(|s| Tween::from_str(s))
+            .unwrap_or(Tween::EaseInOutQuad);
+        
+        let anim = crate::tween::TweenAnimation::new(
+            start_x as f64, start_y as f64,
+            end_x as f64, end_y as f64,
+            duration_ms,
+            tween_fn,
+        );
+        
+        // Use 60 FPS for smooth animation
+        let positions = anim.generate_positions(60);
+        let frame_delay = std::time::Duration::from_millis(duration_ms / positions.len().max(1) as u64);
+        
+        for (x, y) in positions {
+            if let Err(e) = crate::screen::move_to(x, y) {
+                return AgentResult::err(e.to_string());
+            }
+            std::thread::sleep(frame_delay);
+        }
+        
+        AgentResult::ok()
     }
     
     fn mouse_click(&mut self, button: Option<String>) -> AgentResult {
@@ -250,6 +439,26 @@ impl AgentHID {
             Ok(_) => AgentResult::ok(),
             Err(e) => AgentResult::err(e.to_string()),
         }
+    }
+    
+    fn type_text_with_interval(&mut self, text: &str, interval: Option<u64>) -> AgentResult {
+        let interval_ms = interval.unwrap_or(0);
+        if interval_ms == 0 {
+            return self.type_text(text);
+        }
+        
+        if let Err(e) = self.ensure_keyboard() {
+            return AgentResult::err(e.to_string());
+        }
+        
+        let delay = std::time::Duration::from_millis(interval_ms);
+        for c in text.chars() {
+            if let Err(e) = self.keyboard.type_char(c) {
+                return AgentResult::err(e.to_string());
+            }
+            std::thread::sleep(delay);
+        }
+        AgentResult::ok()
     }
     
     fn key_press(&mut self, key: &str) -> AgentResult {
@@ -363,6 +572,123 @@ impl AgentHID {
             Ok(_) => AgentResult::ok(),
             Err(e) => AgentResult::err(e.to_string()),
         }
+    }
+    
+    // Drag operations
+    fn mouse_drag(&mut self, x: i32, y: i32, button: Option<String>) -> AgentResult {
+        if let Err(e) = self.ensure_mouse() {
+            return AgentResult::err(e.to_string());
+        }
+        let btn = Self::parse_mouse_button(button);
+        
+        // Press, move, release
+        if let Err(e) = self.mouse.press(btn) {
+            return AgentResult::err(e.to_string());
+        }
+        std::thread::sleep(std::time::Duration::from_millis(10));
+        
+        if let Err(e) = self.mouse.move_by(x, y) {
+            let _ = self.mouse.release(btn);
+            return AgentResult::err(e.to_string());
+        }
+        std::thread::sleep(std::time::Duration::from_millis(10));
+        
+        match self.mouse.release(btn) {
+            Ok(_) => AgentResult::ok(),
+            Err(e) => AgentResult::err(e.to_string()),
+        }
+    }
+    
+    fn mouse_drag_with_duration(&mut self, x: i32, y: i32, button: Option<String>, duration: Option<u64>, tween: Option<String>) -> AgentResult {
+        let duration_ms = duration.unwrap_or(0);
+        if duration_ms == 0 {
+            return self.mouse_drag(x, y, button);
+        }
+        
+        let btn = Self::parse_mouse_button(button);
+        let current = match crate::screen::position() {
+            Ok(p) => p,
+            Err(e) => return AgentResult::err(e.to_string()),
+        };
+        
+        if let Err(e) = self.ensure_mouse() {
+            return AgentResult::err(e.to_string());
+        }
+        if let Err(e) = self.mouse.press(btn) {
+            return AgentResult::err(e.to_string());
+        }
+        std::thread::sleep(std::time::Duration::from_millis(10));
+        
+        let target_x = current.x + x;
+        let target_y = current.y + y;
+        let result = self.animate_move(current.x, current.y, target_x, target_y, duration_ms, tween);
+        
+        std::thread::sleep(std::time::Duration::from_millis(10));
+        let _ = self.mouse.release(btn);
+        
+        result
+    }
+    
+    fn mouse_drag_to(&mut self, x: i32, y: i32, button: Option<String>) -> AgentResult {
+        let btn = Self::parse_mouse_button(button);
+        
+        // Get current position
+        let current = match crate::screen::position() {
+            Ok(p) => p,
+            Err(e) => return AgentResult::err(e.to_string()),
+        };
+        
+        // Press at current position
+        if let Err(e) = self.ensure_mouse() {
+            return AgentResult::err(e.to_string());
+        }
+        if let Err(e) = self.mouse.press(btn) {
+            return AgentResult::err(e.to_string());
+        }
+        std::thread::sleep(std::time::Duration::from_millis(10));
+        
+        // Move to target
+        let dx = x - current.x;
+        let dy = y - current.y;
+        if let Err(e) = self.mouse.move_by(dx, dy) {
+            let _ = self.mouse.release(btn);
+            return AgentResult::err(e.to_string());
+        }
+        std::thread::sleep(std::time::Duration::from_millis(10));
+        
+        // Release
+        match self.mouse.release(btn) {
+            Ok(_) => AgentResult::ok(),
+            Err(e) => AgentResult::err(e.to_string()),
+        }
+    }
+    
+    fn mouse_drag_to_with_duration(&mut self, x: i32, y: i32, button: Option<String>, duration: Option<u64>, tween: Option<String>) -> AgentResult {
+        let duration_ms = duration.unwrap_or(0);
+        if duration_ms == 0 {
+            return self.mouse_drag_to(x, y, button);
+        }
+        
+        let btn = Self::parse_mouse_button(button);
+        let current = match crate::screen::position() {
+            Ok(p) => p,
+            Err(e) => return AgentResult::err(e.to_string()),
+        };
+        
+        if let Err(e) = self.ensure_mouse() {
+            return AgentResult::err(e.to_string());
+        }
+        if let Err(e) = self.mouse.press(btn) {
+            return AgentResult::err(e.to_string());
+        }
+        std::thread::sleep(std::time::Duration::from_millis(10));
+        
+        let result = self.animate_move(current.x, current.y, x, y, duration_ms, tween);
+        
+        std::thread::sleep(std::time::Duration::from_millis(10));
+        let _ = self.mouse.release(btn);
+        
+        result
     }
 }
 

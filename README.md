@@ -43,15 +43,32 @@ from usehid import AgentHID
 
 agent = AgentHID()
 
+# Query screen info
+result = agent.execute({"action": "size"})        # Returns: {width: 1920, height: 1080}
+result = agent.execute({"action": "position"})    # Returns: {x: 100, y: 200}
+
 # Mouse actions
-agent.execute({"action": "mouse_move", "x": 100, "y": 50})
+agent.execute({"action": "mouse_move_to", "x": 500, "y": 300})  # Absolute move
+agent.execute({"action": "mouse_move", "x": 100, "y": 50})      # Relative move
 agent.execute({"action": "mouse_click", "button": "left"})
+agent.execute({"action": "mouse_drag_to", "x": 600, "y": 400})  # Drag to position
 agent.execute({"action": "mouse_scroll", "delta": -3})
 
 # Keyboard actions
 agent.execute({"action": "type", "text": "Hello, World!"})
 agent.execute({"action": "key_press", "key": "enter"})
 agent.execute({"action": "key_combo", "modifiers": ["ctrl", "shift"], "key": "s"})
+```
+
+### Direct Functions (Python)
+
+```python
+import usehid
+
+# Screen info
+width, height = usehid.size()       # Get screen dimensions
+x, y = usehid.position()            # Get mouse position
+usehid.move_to(500, 300)            # Move mouse to absolute position
 ```
 
 ### Direct Device Control
@@ -64,6 +81,7 @@ from usehid import Mouse, Keyboard
 mouse = Mouse()
 mouse.move_by(100, 50)
 mouse.click("left")
+mouse.drag(200, 100)   # Drag by relative offset
 mouse.scroll(-3)
 
 keyboard = Keyboard()
@@ -75,22 +93,32 @@ keyboard.combo(["cmd"], "s")  # Cmd+S to save
 
 ## 📋 Supported Actions
 
+### Screen/Query
+
+| Action | Parameters | Returns | Description |
+|--------|------------|---------|-------------|
+| `size` | — | `width`, `height` | Get screen dimensions |
+| `position` | — | `x`, `y` | Get current mouse position |
+
 ### Mouse
 
 | Action | Parameters | Description |
 |--------|------------|-------------|
-| `mouse_move` | `x`, `y` | Move by relative offset |
+| `mouse_move` | `x`, `y`, `duration`?, `tween`? | Move by relative offset |
+| `mouse_move_to` | `x`, `y`, `duration`?, `tween`? | Move to absolute position |
 | `mouse_click` | `button`? | Click (left/right/middle) |
 | `mouse_double_click` | `button`? | Double click |
 | `mouse_down` | `button`? | Press and hold |
 | `mouse_up` | `button`? | Release |
 | `mouse_scroll` | `delta` | Scroll wheel (+up/-down) |
+| `mouse_drag` | `x`, `y`, `button`?, `duration`?, `tween`? | Drag by relative offset |
+| `mouse_drag_to` | `x`, `y`, `button`?, `duration`?, `tween`? | Drag to absolute position |
 
 ### Keyboard
 
 | Action | Parameters | Description |
 |--------|------------|-------------|
-| `type` | `text` | Type a string |
+| `type` | `text`, `interval`? | Type a string (interval in ms) |
 | `key_press` | `key` | Press and release a key |
 | `key_down` | `key` | Press and hold |
 | `key_up` | `key` | Release |
@@ -99,6 +127,48 @@ keyboard.combo(["cmd"], "s")  # Cmd+S to save
 **Supported modifiers:** `ctrl`, `shift`, `alt`, `cmd`/`meta`/`win`
 
 **Supported keys:** `a-z`, `0-9`, `enter`, `escape`, `backspace`, `tab`, `space`, `up`, `down`, `left`, `right`, `home`, `end`, `pageup`, `pagedown`, `delete`, `insert`, `f1-f12`
+
+### Tween Functions
+
+For smooth movement animations, use the `tween` parameter:
+
+| Tween | Description |
+|-------|-------------|
+| `linear` | Constant speed (default if duration=0) |
+| `ease_in` / `ease_in_quad` | Slow start |
+| `ease_out` / `ease_out_quad` | Slow end |
+| `ease_in_out` / `ease_in_out_quad` | Slow start and end (default) |
+| `ease_in_cubic` | Cubic slow start |
+| `ease_out_cubic` | Cubic slow end |
+| `ease_in_out_cubic` | Cubic slow start and end |
+| `ease_out_elastic` | Elastic bounce effect |
+| `ease_out_bounce` | Bounce effect |
+
+### Failsafe
+
+Emergency stop mechanism - moving mouse to any screen corner triggers failsafe and blocks further actions.
+
+| Action | Returns | Description |
+|--------|---------|-------------|
+| `failsafe_status` | `enabled`, `triggered` | Check failsafe state |
+| `failsafe_enable` | — | Enable failsafe (default) |
+| `failsafe_disable` | — | Disable failsafe |
+| `failsafe_reset` | — | Reset triggered state |
+
+**Usage:**
+```python
+# Check status
+result = agent.execute({"action": "failsafe_status"})
+# {success: true, enabled: true, triggered: false}
+
+# If triggered, reset to continue
+agent.execute({"action": "failsafe_reset"})
+
+# Disable for specific operations (use with caution!)
+agent.execute({"action": "failsafe_disable"})
+# ... operations ...
+agent.execute({"action": "failsafe_enable"})
+```
 
 ### Gamepad
 

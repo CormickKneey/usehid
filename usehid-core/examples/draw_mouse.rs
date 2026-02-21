@@ -2,7 +2,7 @@
 //!
 //! Demonstrates mouse drag operations by drawing shapes
 
-use usehid_core::{Device, Mouse, MouseButton};
+use usehid::{Device, Mouse, MouseButton};
 use std::thread::sleep;
 use std::time::Duration;
 

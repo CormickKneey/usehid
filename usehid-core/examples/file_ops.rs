@@ -2,7 +2,7 @@
 //!
 //! Common file operations: New, Save, Save As, Open
 
-use usehid_core::AgentHID;
+use usehid::AgentHID;
 use std::thread::sleep;
 use std::time::Duration;
 
