@@ -372,6 +372,66 @@ See [skills/usehid/SKILL.md](skills/usehid/SKILL.md) for full documentation.
 
 ---
 
+## 🔄 Comparison with Other Libraries
+
+### Why useHID?
+
+| Feature | useHID | PyAutoGUI | enigo | autopilot-rs | RobotGo |
+|---------|:------:|:---------:|:-----:|:------------:|:-------:|
+| **Agent-Ready JSON API** | ✅ | ❌ | ❌ | ❌ | ❌ |
+| **Failsafe (Emergency Stop)** | ✅ | ✅ | ❌ | ❌ | ❌ |
+| **Multi-language Bindings** | Rust/Python/Node/Go | Python | Rust | Rust | Go |
+| **Gamepad Support** | ✅ | ❌ | ❌ | ❌ | ❌ |
+| **Smooth Tween Animations** | ✅ (10+ functions) | ✅ | ❌ | ❌ | ✅ |
+| **True HID-level Simulation** | ✅ (Linux uhid) | ❌ | ❌ | ❌ | ❌ |
+| **Zero C Dependencies** | ✅ (macOS/Windows) | ❌ | ❌ (libxdo) | ❌ | ❌ (CGO) |
+| **Screenshot** | ❌ | ✅ | ❌ | ✅ | ✅ |
+| **Image Recognition** | ❌ | ✅ | ❌ | ❌ | ✅ (OpenCV) |
+| **Window Control** | ❌ | ✅ (Win) | ❌ | ❌ | ✅ |
+
+### Key Advantages
+
+**🤖 Built for AI Agents**
+```python
+# Other libraries: function calls
+pyautogui.moveTo(100, 200)
+pyautogui.click()
+
+# useHID: JSON actions (perfect for LLM tool-calling)
+agent.execute({"action": "mouse_move_to", "x": 100, "y": 200})
+agent.execute({"action": "mouse_click"})
+```
+
+**🛡️ Safety First**
+- Built-in failsafe: move mouse to any screen corner to stop all automation
+- Query and control failsafe state via API
+- No accidental runaway scripts
+
+**🎮 Unique Gamepad Support**
+- Virtual gamepad for game automation and testing
+- Full controller emulation: buttons, sticks, triggers
+
+**🌐 True Multi-language**
+- Single Rust core with native bindings
+- No subprocess spawning or IPC overhead
+- Consistent API across Python, Node.js, and Go
+
+**⚡ Pure Rust Performance**
+- No C dependencies on macOS/Windows
+- Memory-safe by design
+- Fast and lightweight
+
+### When to Use Others
+
+| Library | Best For |
+|---------|----------|
+| **PyAutoGUI** | Screenshot + image recognition workflows |
+| **RobotGo** | Go projects needing OpenCV integration |
+| **enigo** | Rust projects needing Wayland support |
+| **autopilot-rs** | Simple Rust automation with screenshots |
+
+---
+
 ## 📄 License
 
 MIT License - see [LICENSE](LICENSE) for details.
