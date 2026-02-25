@@ -1,0 +1,16 @@
+[package]
+name = "usehid-cli"
+version.workspace = true
+edition.workspace = true
+authors.workspace = true
+license.workspace = true
+description = "CLI tool for cross-platform virtual HID device control"
+
+[[bin]]
+name = "usehid"
+path = "src/main.rs"
+
+[dependencies]
+usehid = { path = "../usehid-core" }
+clap = { version = "4", features = ["derive"] }
+serde_json = "1.0"

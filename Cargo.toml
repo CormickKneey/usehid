@@ -2,6 +2,7 @@
 resolver = "2"
 members = [
     "usehid-core",
+    "usehid-cli",
     "usehid-python",
     # "usehid-node",  # TODO: napi-rs binding
 ]
