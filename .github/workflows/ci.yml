@@ -22,7 +22,10 @@ jobs:
       
       - name: Build
         run: cargo build --release -p usehid-core
-      
+
+      - name: Build CLI
+        run: cargo build --release -p usehid-cli
+
       - name: Test
         run: cargo test -p usehid-core
 
